@@ -34,7 +34,7 @@ def main():
 
     # 3. Setup Video Source (0 for webcam, or path for video file / RTSP)
     # Ideally passed via argument, defaulting to a sample path
-    video_source = "sample_video.mp4" 
+    video_source = r"sample videos\sample1.mp4" 
     try:
         stream = StreamManager(video_source)
     except Exception as e:
