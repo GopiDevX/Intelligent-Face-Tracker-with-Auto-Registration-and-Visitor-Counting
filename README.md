@@ -3,7 +3,7 @@
 An AI-driven unique visitor counter that processes video streams to detect, track, and recognize faces in real-time. The system automatically registers new faces upon first detection, recognizing them in subsequent frames, and tracks them continuously until they exit the frame.
 
 ## Video Demonstration
-👉 **[Insert your Loom or YouTube video link here]**
+👉 **[YouTube Demo](https://youtu.be/y5Jl8OqU0D0)**
 
 ## Setup Instructions
 1. Install Python 3.9+
