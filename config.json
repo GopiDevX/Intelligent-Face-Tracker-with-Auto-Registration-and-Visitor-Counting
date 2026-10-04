@@ -1,0 +1,19 @@
+{
+    "system": {
+        "debug_mode": false,
+        "log_level": "INFO"
+    },
+    "pipeline": {
+        "frame_skip": 3,
+        "resize_width": 640,
+        "detection_confidence_threshold": 0.5,
+        "recognition_similarity_threshold": 0.55,
+        "max_lost_frames": 30
+    },
+    "storage": {
+        "db_path": "data/tracker.db",
+        "log_file": "logs/events.log",
+        "entries_dir": "logs/entries",
+        "exits_dir": "logs/exits"
+    }
+}
