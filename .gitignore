@@ -29,3 +29,7 @@ check_drive.py
 powershell.exe
 powershell.cmd
 models/
+
+*.mp4
+sample videos/
+*.pt

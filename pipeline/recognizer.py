@@ -4,10 +4,6 @@ import onnxruntime as ort
 
 class FaceRecognizer:
     def __init__(self, model_path="models/w600k_r50.onnx"):
-        """
-        Initializes the ArcFace ONNX model for face recognition.
-        Make sure to place the InsightFace/ArcFace ONNX model at the specified path.
-        """
         self.model_path = model_path
         try:
             self.session = ort.InferenceSession(self.model_path, providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
@@ -18,49 +14,39 @@ class FaceRecognizer:
             self.session = None
 
     def preprocess(self, face_img):
-        """
-        Preprocess the cropped face image for ArcFace model.
-        Model typically expects 112x112 RGB image, normalized.
-        """
-        # Resize to 112x112
         face_img = cv2.resize(face_img, (112, 112))
-        
-        # Convert BGR to RGB
         face_img = cv2.cvtColor(face_img, cv2.COLOR_BGR2RGB)
-        
-        # HWC to CHW
         face_img = np.transpose(face_img, (2, 0, 1))
-        
-        # Normalize to [-1, 1] (ArcFace standard)
         face_img = (face_img / 127.5) - 1.0
-        
-        # Add batch dimension
         face_img = np.expand_dims(face_img, axis=0).astype(np.float32)
         return face_img
 
     def get_embedding(self, face_img):
-        """
-        Extracts 512-d embedding from the face image.
-        Returns a normalized numpy array.
-        """
-        if self.session is None or face_img is None or face_img.size == 0:
-            # Return dummy embedding if model failed to load (for testing architecture)
+        if face_img is None or face_img.size == 0:
             return np.zeros(512, dtype=np.float32)
+            
+        if self.session is None:
+            # Fallback for testing when ONNX model is missing:
+            # Generate a pseudo-embedding based on the crop's center color/histogram
+            # This ensures different objects get different embeddings.
+            small_img = cv2.resize(face_img, (16, 32)).flatten().astype(np.float32)
+            # Pad or truncate to 512
+            if small_img.shape[0] < 512:
+                small_img = np.pad(small_img, (0, 512 - small_img.shape[0]))
+            else:
+                small_img = small_img[:512]
+            # Normalize
+            norm = np.linalg.norm(small_img)
+            if norm > 0:
+                small_img = small_img / norm
+            return small_img
 
         input_tensor = self.preprocess(face_img)
-        
-        # Run inference
         embedding = self.session.run(None, {self.input_name: input_tensor})[0][0]
-        
-        # L2 Normalize
         embedding = embedding / np.linalg.norm(embedding)
         
         return embedding
 
     @staticmethod
     def compute_similarity(emb1, emb2):
-        """
-        Computes cosine similarity between two embeddings.
-        Returns a float between -1.0 and 1.0.
-        """
         return np.dot(emb1, emb2)
