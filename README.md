@@ -2,12 +2,30 @@
 
 An AI-driven unique visitor counter that processes video streams to detect, track, and recognize faces in real-time. The system automatically registers new faces upon first detection, recognizing them in subsequent frames, and tracks them continuously until they exit the frame.
 
+## Video Demonstration
+👉 **[Insert your Loom or YouTube video link here]**
+
 ## Setup Instructions
 1. Install Python 3.9+
 2. Install dependencies: `pip install -r requirements.txt`
 3. Configure settings in `config.json`
-4. Download the ONNX model files to `models/` directory (Detailed instructions later)
-5. Run the application: `python main.py`
+4. Run the application: `python main.py`
+
+## Sample config.json Structure
+```json
+{
+  "system": {
+    "log_level": "INFO",
+    "db_path": "data/tracker.db"
+  },
+  "pipeline": {
+    "frame_skip": 3,
+    "confidence_threshold": 0.5,
+    "similarity_threshold": 0.4
+  }
+}
+```
+
 
 ## Architecture & Assumptions
 - **Architecture**: Core Pipeline utilizes YOLO for detection, ByteTrack logic for object tracking, and ArcFace ONNX model for embeddings.
