@@ -33,7 +33,7 @@ class FaceDetector:
             for box in result.boxes:
                 # If using standard YOLO, optionally filter for class 0 (person)
                 cls_id = int(box.cls[0])
-                if "yolov8n.pt" in self.model.ckpt_path and cls_id != 0:
+                if cls_id != 0:
                     continue
                     
                 x1, y1, x2, y2 = box.xyxy[0].tolist()

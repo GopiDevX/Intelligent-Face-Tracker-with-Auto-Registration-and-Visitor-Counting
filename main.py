@@ -8,12 +8,21 @@ from pipeline.detector import FaceDetector
 from pipeline.recognizer import FaceRecognizer
 from pipeline.tracker import FaceTracker
 from pipeline.stream_manager import StreamManager
+import threading
+from ui.app import app, update_frame
+
+def start_web_ui():
+    app.run(host='0.0.0.0', port=5000, debug=False, use_reloader=False)
 
 def load_config(config_path="config.json"):
     with open(config_path, "r") as f:
         return json.load(f)
 
 def main():
+    # Start Web Dashboard in a background thread
+    ui_thread = threading.Thread(target=start_web_ui, daemon=True)
+    ui_thread.start()
+
     # 1. Load Configuration
     config = load_config()
     db_path = config["storage"]["db_path"]
@@ -51,6 +60,9 @@ def main():
             break
 
         timestamp = datetime.now()
+        update_frame(frame)
+        import time
+        time.sleep(0.03)  # Simulate 30 FPS playback for the dashboard!
 
         # Frame skip logic for performance
         if frame_count % frame_skip == 0:
@@ -90,6 +102,13 @@ def main():
 
     stream.release()
     logger.log_info(f"Total Unique Visitors Count: {db.get_unique_visitor_count()}")
+    
+    logger.log_info("Video processing finished. Keeping Web UI server alive... Press Ctrl+C to exit.")
+    try:
+        while ui_thread.is_alive():
+            ui_thread.join(1.0)
+    except KeyboardInterrupt:
+        logger.log_info("Shutting down...")
 
 if __name__ == "__main__":
     main()

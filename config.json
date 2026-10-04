@@ -6,9 +6,9 @@
     "pipeline": {
         "frame_skip": 3,
         "resize_width": 640,
-        "detection_confidence_threshold": 0.5,
-        "recognition_similarity_threshold": 0.55,
-        "max_lost_frames": 30
+        "detection_confidence_threshold": 0.4,
+        "recognition_similarity_threshold": 0.70,
+        "max_lost_frames": 90
     },
     "storage": {
         "db_path": "data/tracker.db",

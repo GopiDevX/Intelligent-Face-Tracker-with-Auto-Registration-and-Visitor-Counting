@@ -27,19 +27,17 @@ class FaceRecognizer:
             
         if self.session is None:
             # Fallback for testing when ONNX model is missing:
-            # Generate a pseudo-embedding based on the crop's center color/histogram
-            # This ensures different objects get different embeddings.
-            small_img = cv2.resize(face_img, (16, 32)).flatten().astype(np.float32)
+            # Use a 3D color histogram of the bounding box. This is translation-invariant 
+            # and works incredibly well for tracking full-body persons based on clothing color!
+            hist = cv2.calcHist([face_img], [0, 1, 2], None, [8, 8, 8], [0, 256, 0, 256, 0, 256])
+            hist = cv2.normalize(hist, hist).flatten()
+            
             # Pad or truncate to 512
-            if small_img.shape[0] < 512:
-                small_img = np.pad(small_img, (0, 512 - small_img.shape[0]))
+            if hist.shape[0] < 512:
+                hist = np.pad(hist, (0, 512 - hist.shape[0]))
             else:
-                small_img = small_img[:512]
-            # Normalize
-            norm = np.linalg.norm(small_img)
-            if norm > 0:
-                small_img = small_img / norm
-            return small_img
+                hist = hist[:512]
+            return hist
 
         input_tensor = self.preprocess(face_img)
         embedding = self.session.run(None, {self.input_name: input_tensor})[0][0]
